@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Sozlamalar - UniDoc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-cog me-2"></i> Sozlamalar</h1>
+    <p>Hisobingiz va tizim sozlamalari</p>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">Sozlamalar Menyusi</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="#profile" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                    <i class="fas fa-user me-2"></i> Profil Sozlamalari
+                </a>
+                <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-shield-alt me-2"></i> Xavfsizlik
+                </a>
+                <a href="#notifications" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-bell me-2"></i> Bildirishnomalar
+                </a>
+                <a href="#privacy" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-lock me-2"></i> Maxfiylik
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="tab-content">
+            <!-- Profile Settings -->
+            <div class="tab-pane fade show active" id="profile">
+                <div class="card card-custom">
+                    <div class="card-header card-header-gradient">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-edit me-2"></i> Profil Ma'lumotlarini Tahrirlash
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">Ism</label>
+                                    <input type="text" class="form-control" id="firstName" 
+                                           value="{{ current_user.first_name }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">Familiya</label>
+                                    <input type="text" class="form-control" id="lastName" 
+                                           value="{{ current_user.last_name }}">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email manzil</label>
+                                <input type="email" class="form-control" id="email" 
+                                       value="{{ current_user.email }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="department" class="form-label">Kafedra</label>
+                                <input type="text" class="form-control" id="department" 
+                                       value="{{ current_user.department or '' }}" 
+                                       placeholder="Kafedra nomi">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="faculty" class="form-label">Fakultet</label>
+                                <input type="text" class="form-control" id="faculty" 
+                                       value="{{ current_user.faculty or '' }}" 
+                                       placeholder="Fakultet nomi">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary-gradient">
+                                <i class="fas fa-save me-2"></i>O'zgartirishlarni Saqlash
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Settings -->
+            <div class="tab-pane fade" id="security">
+                <div class="card card-custom">
+                    <div class="card-header card-header-gradient">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-shield-alt me-2"></i> Xavfsizlik Sozlamalari
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="currentPassword" class="form-label">Joriy parol</label>
+                                <input type="password" class="form-control" id="currentPassword">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label">Yangi parol</label>
+                                <input type="password" class="form-control" id="newPassword">
+                                <div class="form-text">Parol kamida 8 belgidan iborat bo'lishi kerak</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Yangi parolni tasdiqlang</label>
+                                <input type="password" class="form-control" id="confirmPassword">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary-gradient">
+                                <i class="fas fa-key me-2"></i>Parolni Yangilash
+                            </button>
+                        </form>
+                        
+                        <hr class="my-4">
+                        
+                        <h6>Seanslar</h6>
+                        <div class="alert alert-info-custom alert-custom">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Joriy seans:</strong> {{ request.remote_addr }} - {{ now.strftime('%Y-%m-%d %H:%M') }}
+                        </div>
+                        
+                        <button class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i>Barcha Boshqa Seanslardan Chiqish
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notification Settings -->
+            <div class="tab-pane fade" id="notifications">
+                <div class="card card-custom">
+                    <div class="card-header card-header-gradient">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-bell me-2"></i> Bildirishnoma Sozlamalari
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                    <label class="form-check-label" for="emailNotifications">
+                                        Email bildirishnomalari
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="browserNotifications" checked>
+                                    <label class="form-check-label" for="browserNotifications">
+                                        Brauzer bildirishnomalari
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <h6 class="mt-4">Bildirishnoma Turlari</h6>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="docApproved" checked>
+                                    <label class="form-check-label" for="docApproved">
+                                        Hujjat tasdiqlanganda
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="docRejected" checked>
+                                    <label class="form-check-label" for="docRejected">
+                                        Hujjat rad etilganda
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="newComment" checked>
+                                    <label class="form-check-label" for="newComment">
+                                        Yangi izoh qo'shilganda
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="systemUpdates">
+                                    <label class="form-check-label" for="systemUpdates">
+                                        Tizim yangilanishlari
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary-gradient">
+                                <i class="fas fa-save me-2"></i>Sozlamalarni Saqlash
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Privacy Settings -->
+            <div class="tab-pane fade" id="privacy">
+                <div class="card card-custom">
+                    <div class="card-header card-header-gradient">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-lock me-2"></i> Maxfiylik Sozlamalari
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="profileVisibility" checked>
+                                    <label class="form-check-label" for="profileVisibility">
+                                        Profil ma'lumotlarini boshqalarga ko'rsatish
+                                    </label>
+                                </div>
+                                <div class="form-text">Profil ma'lumotlaringiz fakultet doirasidagi foydalanuvchilar ko'ra oladi</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="activityVisibility">
+                                    <label class="form-check-label" for="activityVisibility">
+                                        Faollik tarixini boshqalarga ko'rsatish
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="dataRetention" class="form-label">Ma'lumotlarni saqlash muddati</label>
+                                <select class="form-select" id="dataRetention">
+                                    <option value="1">1 yil</option>
+                                    <option value="2" selected>2 yil</option>
+                                    <option value="3">3 yil</option>
+                                    <option value="5">5 yil</option>
+                                </select>
+                                <div class="form-text">Tizimda saqlanadigan shaxsiy ma'lumotlaringizning muddati</div>
+                            </div>
+                            
+                            <hr class="my-4">
+                            
+                            <h6>Ma'lumotlarni o'chirish</h6>
+                            <div class="alert alert-warning-custom alert-custom">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Ogohlantirish:</strong> Hisobingizni o'chirish barqaror amal. Barcha ma'lumotlaringiz butunlay o'chiriladi va qayta tiklab bo'lmaydi.
+                            </div>
+                            
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                <i class="fas fa-trash me-2"></i>Hisobni O'chirish
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Hisobni O'chirish
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Hisobingizni o'chirishni tasdiqlaysizmi?</p>
+                <p><strong>Bu amalni ortga qaytarib bo'lmaydi!</strong></p>
+                <p>Quyidagilar o'chiriladi:</p>
+                <ul>
+                    <li>Barcha shaxsiy ma'lumotlar</li>
+                    <li>Yaratilgan barcha hujjatlar</li>
+                    <li>Faollik tarixi</li>
+                </ul>
+                <div class="mb-3">
+                    <label for="confirmDelete" class="form-label">Tasdiqlash uchun "DELETE" so'zini kiriting:</label>
+                    <input type="text" class="form-control" id="confirmDelete" placeholder="DELETE">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                    <i class="fas fa-trash me-2"></i>Hisobni O'chirish
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Tab navigation
+const triggerTabList = document.querySelectorAll('a[data-bs-toggle="list"]')
+triggerTabList.forEach(triggerEl => {
+    const tabTrigger = new bootstrap.Tab(triggerEl)
+    triggerEl.addEventListener('click', event => {
+        event.preventDefault()
+        tabTrigger.show()
+    })
+})
+
+// Delete account confirmation
+document.getElementById('confirmDelete').addEventListener('input', function() {
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    confirmBtn.disabled = this.value !== 'DELETE';
+});
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    alert('Hisob o\'chirish amaliyoti ishga tushadi (demo)');
+    bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal')).hide();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Tizimga Kirish - UniDoc{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient text-center">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-sign-in-alt me-2"></i>Tizimga Kirish
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('login') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Foydalanuvchi nomi</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Parol</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                        <label class="form-check-label" for="remember">Eslab qolish</label>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary-gradient">
+                            <i class="fas fa-sign-in-alt me-2"></i>Kirish
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('forgot_password') }}" class="text-decoration-none">Parolni unutdingizmi?</a>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <p class="text-muted">Tizimda hisobingiz yo'qmi?</p>
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-user-plus me-2"></i>Ro'yxatdan o'tish
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Demo Accounts Info -->
+        <div class="card card-custom mt-4">
+            <div class="card-body">
+                <h6 class="card-title"><i class="fas fa-info-circle me-2 text-info"></i>Demo Hisoblar</h6>
+                <div class="row small">
+                    <div class="col-6">
+                        <strong>Talaba:</strong><br>
+                        Login: student1<br>
+                        Parol: 123
+                    </div>
+                    <div class="col-6">
+                        <strong>O'qituvchi:</strong><br>
+                        Login: teacher1<br>
+                        Parol: 123
+                    </div>
+                    <div class="col-6 mt-2">
+                        <strong>Admin:</strong><br>
+                        Login: admin<br>
+                        Parol: admin123
+                    </div>
+                    <div class="col-6 mt-2">
+                        <strong>Kafedra mudiri:</strong><br>
+                        Login: head1<br>
+                        Parol: 123
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

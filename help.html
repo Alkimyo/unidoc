@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block title %}Yordam - UniDoc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-question-circle me-2"></i> Yordam Markazi</h1>
+    <p>Tizimdan foydalanish bo'yicha qo'llanma va ko'p so'raladigan savollar</p>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <!-- Yordam navigatsiyasi -->
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i> Mavzular
+                </h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="#getting-started" class="list-group-item list-group-item-action">Boshlash</a>
+                <a href="#documents" class="list-group-item list-group-item-action">Hujjatlar bilan ishlash</a>
+                <a href="#approvals" class="list-group-item list-group-item-action">Tasdiqlash jarayoni</a>
+                <a href="#roles" class="list-group-item list-group-item-action">Foydalanuvchi rollari</a>
+                <a href="#faq" class="list-group-item list-group-item-action">Ko'p so'raladigan savollar</a>
+                <a href="#contact" class="list-group-item list-group-item-action">Aloqa</a>
+            </div>
+        </div>
+
+        <!-- Tezkor yordam -->
+        <div class="card card-custom mt-4">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-life-ring me-2"></i> Tezkor Yordam
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('create_document') }}" class="btn btn-primary-gradient btn-sm">
+                        <i class="fas fa-plus me-2"></i>Hujjat Yaratish
+                    </a>
+                    <a href="{{ url_for('documents') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-folder me-2"></i>Hujjatlarim
+                    </a>
+                    <a href="{{ url_for('approvals') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-check me-2"></i>Tasdiqlash
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <!-- Boshlash bo'limi -->
+        <div class="card card-custom mb-4" id="getting-started">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-play-circle me-2"></i> Tizimga Kirish va Boshlash
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Ro'yxatdan o'tish</h6>
+                <p>Yangi foydalanuvchilar ro'yxatdan o'tish orqali tizimga kirishlari mumkin. Ro'yxatdan o'tish faqat talabalar uchun ochiq.</p>
+                
+                <h6 class="mt-4">Tizimga kirish</h6>
+                <p>Mavjud hisobingiz bilan tizimga kiring. Agar parolingizni unutgan bo'lsangiz, "Parolni unutdingizmi?" tugmasini bosing.</p>
+                
+                <h6 class="mt-4">Bosh panel</h6>
+                <p>Tizimga kirgach, siz bosh panelni ko'rasiz. Bu yerda:</p>
+                <ul>
+                    <li>Hujjatlar statistikasi</li>
+                    <li>So'nggi hujjatlar</li>
+                    <li>Tezkor amallar</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Hujjatlar bilan ishlash -->
+        <div class="card card-custom mb-4" id="documents">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-file-alt me-2"></i> Hujjatlar bilan Ishlash
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Yangi hujjat yaratish</h6>
+                <p>Yangi hujjat yaratish uchun:</p>
+                <ol>
+                    <li>Yon panelda "Hujjat yaratish" ni bosing</li>
+                    <li>Hujjat nomi va turini kiriting</li>
+                    <li>Hujjat tavsifini yozing (ixtiyoriy)</li>
+                    <li>Fayl yuklashingiz mumkin (ixtiyoriy)</li>
+                    <li>"Saqlash" tugmasini bosing</li>
+                </ol>
+
+                <h6 class="mt-4">Hujjatni tahrirlash</h6>
+                <p>Faqat "Qoralama" holatidagi hujjatlarni tahrirlash mumkin. Yuborilgan hujjatlarni tahrirlab bo'lmaydi.</p>
+
+                <h6 class="mt-4">Hujjatni yuborish</h6>
+                <p>Hujjatni tasdiqlash jarayoniga yuborish uchun:</p>
+                <ol>
+                    <li>"Mening hujjatlarim" bo'limiga o'ting</li>
+                    <li>Yubormoqchi bo'lgan hujjatni tanlang</li>
+                    <li>"Yuborish" tugmasini bosing</li>
+                </ol>
+                <div class="alert alert-warning-custom alert-custom mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Diqqat!</strong> Hujjat yuborilgandan so'ng uni tahrirlab bo'lmaydi.
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasdiqlash jarayoni -->
+        <div class="card card-custom mb-4" id="approvals">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-check-circle me-2"></i> Tasdiqlash Jarayoni
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="workflow-stepper mb-4">
+                    <div class="stepper-step completed">
+                        <div class="stepper-circle">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stepper-label">Yaratish</div>
+                    </div>
+                    <div class="stepper-step completed">
+                        <div class="stepper-circle">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <div class="stepper-label">Yuborish</div>
+                    </div>
+                    <div class="stepper-step active">
+                        <div class="stepper-circle">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stepper-label">Rahbar</div>
+                    </div>
+                    <div class="stepper-step">
+                        <div class="stepper-circle">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="stepper-label">Kafedra</div>
+                    </div>
+                    <div class="stepper-step">
+                        <div class="stepper-circle">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="stepper-label">Dekan</div>
+                    </div>
+                </div>
+
+                <h6>Tasdiqlash bosqichlari</h6>
+                <ul>
+                    <li><strong>Rahbar tasdig'i:</strong> Ilmiy rahbar hujjatni ko'rib chiqadi va tasdiqlaydi</li>
+                    <li><strong>Kafedra tasdig'i:</strong> Kafedra mudiri hujjatni tasdiqlaydi</li>
+                    <li><strong>Dekan tasdig'i:</strong> Fakultet dekani yakuniy tasdiqni beradi</li>
+                </ul>
+
+                <h6 class="mt-4">Tasdiqlash vaqti</h6>
+                <p>Har bir bosqich uchun maksimal 3 ish kuni belgilangan. Agar bu vaqt ichida tasdiqlanmasa, avtomatik ravishda keyingi bosqichga o'tadi.</p>
+
+                <h6 class="mt-4">Rad etish</h6>
+                <p>Agar hujjat rad etilsa, muallifga izoh bilan birga xabar yuboriladi. Muallif hujjatni tahrirlab qayta yuborishi mumkin.</p>
+            </div>
+        </div>
+
+        <!-- Foydalanuvchi rollari -->
+        <div class="card card-custom mb-4" id="roles">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-users me-2"></i> Foydalanuvchi Rollari
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <span class="role-badge role-student mb-2">Talaba</span>
+                            <h6>Huquqlar:</h6>
+                            <ul class="small">
+                                <li>Hujjat yaratish</li>
+                                <li>O'z hujjatlarini ko'rish</li>
+                                <li>Hujjatlarni yuborish</li>
+                                <li>Holatni kuzatish</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <span class="role-badge role-teacher mb-2">O'qituvchi</span>
+                            <h6>Huquqlar:</h6>
+                            <ul class="small">
+                                <li>Talaba huquqlari</li>
+                                <li>Talabalar hujjatlarini tasdiqlash</li>
+                                <li>Nazorat qilish</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <span class="role-badge role-head mb-2">Kafedra Mudiri</span>
+                            <h6>Huquqlar:</h6>
+                            <ul class="small">
+                                <li>O'qituvchi huquqlari</li>
+                                <li>Kafedra hujjatlarini tasdiqlash</li>
+                                <li>Kafedra statistikasi</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <span class="role-badge role-dean mb-2">Dekan</span>
+                            <h6>Huquqlar:</h6>
+                            <ul class="small">
+                                <li>Kafedra mudiri huquqlari</li>
+                                <li>Fakultet hujjatlarini tasdiqlash</li>
+                                <li>Fakultet statistikasi</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ko'p so'raladigan savollar -->
+        <div class="card card-custom mb-4" id="faq">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-question me-2"></i> Ko'p So'raladigan Savollar
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="faqAccordion">
+                    <!-- FAQ 1 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqAnswer1">
+                                Hujjatni qanday qayta yuborish mumkin?
+                            </button>
+                        </h2>
+                        <div id="faqAnswer1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Agar hujjat rad etilgan bo'lsa, siz uni tahrirlab qayta yuborishingiz mumkin. "Mening hujjatlarim" bo'limida rad etilgan hujjatni tanlang va "Qayta yuborish" tugmasini bosing.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqAnswer2">
+                                Tasdiqlash qancha vaqt oladi?
+                            </button>
+                        </h2>
+                        <div id="faqAnswer2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Har bir bosqich uchun maksimal 3 ish kuni. Butun jarayon odatda 1-2 hafta ichida yakunlanadi.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqAnswer3">
+                                Fayl qanday formatlarda yuklanishi mumkin?
+                            </button>
+                        </h2>
+                        <div id="faqAnswer3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Qo'llab-quvvatlanadigan formatlar: PDF, DOC, DOCX, TXT. Maksimal fayl hajmi: 10MB.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq4">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqAnswer4">
+                                Parolni qanday o'zgartirish mumkin?
+                            </button>
+                        </h2>
+                        <div id="faqAnswer4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Profil > Sozlamalar > Xavfsizlik bo'limida parolni o'zgartirishingiz mumkin.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 5 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq5">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqAnswer5">
+                                Hisobim bloklangan bo'lsa nima qilish kerak?
+                            </button>
+                        </h2>
+                        <div id="faqAnswer5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Agar hisobingiz bloklangan bo'lsa, IT bo'limi yoki administrator bilan bog'laning.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aloqa -->
+        <div class="card card-custom" id="contact">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-envelope me-2"></i> Aloqa
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Texnik yordam</h6>
+                        <p>Agar tizim bilan bog'liq muammolar yuzaga kelsa, quyidagi ma'lumotlar orqali bog'lanishingiz mumkin:</p>
+                        
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-envelope me-2 text-primary"></i> <strong>Email:</strong> support@university.uz</li>
+                            <li><i class="fas fa-phone me-2 text-primary"></i> <strong>Telefon:</strong> +998 71 123 45 67</li>
+                            <li><i class="fas fa-clock me-2 text-primary"></i> <strong>Ish vaqti:</strong> 9:00 - 18:00</li>
+                            <li><i class="fas fa-building me-2 text-primary"></i> <strong>Manzil:</strong> Bosh binosi, 3-qavat</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6>Qo'shimcha ma'lumot</h6>
+                        <p>Tizim bilan bog'liq taklif va shikoyatlaringizni quyidagi forma orqali yuborishingiz mumkin:</p>
+                        
+                        <form>
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Ismingiz</label>
+                                <input type="text" class="form-control" id="name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email">
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Xabar</label>
+                                <textarea class="form-control" id="message" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary-gradient">
+                                <i class="fas fa-paper-plane me-2"></i>Xabarni Yuborish
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Smooth scroll for navigation
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// FAQ accordion faol elementini belgilash
+const faqItems = document.querySelectorAll('.accordion-button');
+faqItems.forEach(item => {
+    item.addEventListener('click', function() {
+        // Boshqa barcha accordionlarni yopish
+        faqItems.forEach(otherItem => {
+            if (otherItem !== item) {
+                otherItem.classList.add('collapsed');
+                const target = document.querySelector(otherItem.getAttribute('data-bs-target'));
+                if (target) {
+                    target.classList.remove('show');
+                }
+            }
+        });
+    });
+});
+</script>
+
+<style>
+.accordion-button:not(.collapsed) {
+    background-color: #f8fafc;
+    color: #667eea;
+    border-color: #667eea;
+}
+
+.accordion-button:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+}
+</style>
+{% endblock %}

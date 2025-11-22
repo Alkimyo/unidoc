@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Universitet Hujjat Aylanish Tizimi{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #0f172a;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* ==================== NAVBAR ==================== */
+        .navbar-custom {
+            background: var(--primary-gradient);
+            padding: 1rem 2rem;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand i {
+            font-size: 2rem;
+            background: var(--secondary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white !important;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--secondary-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .user-dropdown {
+            margin-left: auto;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            border-color: white;
+        }
+
+        /* ==================== SIDEBAR ==================== */
+        .sidebar {
+            width: 280px;
+            background: white;
+            min-height: calc(100vh - 80px);
+            box-shadow: var(--card-shadow);
+            padding: 2rem 0;
+            position: fixed;
+            left: 0;
+            top: 80px;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid var(--light-bg);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h5 {
+            color: #667eea;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-menu li {
+            margin: 5px 0;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 2rem;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            border-left-color: #667eea;
+        }
+
+        .sidebar-menu a.active {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            border-left-color: #667eea;
+            font-weight: 600;
+        }
+
+        .sidebar-menu i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* ==================== MAIN CONTENT ==================== */
+        .main-content {
+            margin-left: 280px;
+            margin-top: 80px;
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
+        }
+
+        .page-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .page-header h1 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .page-header p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        /* ==================== CARDS ==================== */
+        .card-custom {
+            border: none;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.25);
+        }
+
+        .card-header-gradient {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn-primary-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-gradient:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        .btn-secondary-gradient {
+            background: var(--secondary-gradient);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary-gradient:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(245, 87, 108, 0.3);
+            color: white;
+        }
+
+        .btn-accent-gradient {
+            background: var(--accent-gradient);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-accent-gradient:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3);
+            color: white;
+        }
+
+        /* ==================== BADGES & STATUS ==================== */
+        .badge-success {
+            background: var(--success-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-warning {
+            background: var(--warning-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-danger {
+            background: var(--danger-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* ==================== ALERTS ==================== */
+        .alert-custom {
+            border: none;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid;
+        }
+
+        .alert-success-custom {
+            background-color: #ecfdf5;
+            border-left-color: var(--success-color);
+            color: #065f46;
+        }
+
+        .alert-warning-custom {
+            background-color: #fffbeb;
+            border-left-color: var(--warning-color);
+            color: #78350f;
+        }
+
+        .alert-danger-custom {
+            background-color: #fef2f2;
+            border-left-color: var(--danger-color);
+            color: #7f1d1d;
+        }
+
+        .alert-info-custom {
+            background-color: #eff6ff;
+            border-left-color: #667eea;
+            color: #0c4a6e;
+        }
+
+        /* ==================== NOTIFICATIONS ==================== */
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: white;
+            margin-right: 1.5rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 70px;
+            right: 0;
+            width: 350px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            z-index: 1001;
+            display: none;
+        }
+
+        .notification-dropdown.show {
+            display: block;
+        }
+
+        /* ==================== WORKFLOW STEPPER ==================== */
+        .workflow-stepper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .stepper-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .stepper-step::after {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: #e2e8f0;
+            z-index: -1;
+        }
+
+        .stepper-step:last-child::after {
+            display: none;
+        }
+
+        .stepper-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-weight: 600;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+
+        .stepper-step.completed .stepper-circle {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .stepper-step.active .stepper-circle {
+            background: var(--primary-gradient);
+            border-color: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .stepper-label {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* ==================== DOCUMENT TABLE ==================== */
+        .table-custom {
+            border-collapse: collapse;
+        }
+
+        .table-custom thead th {
+            background: var(--primary-gradient);
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 1.2rem;
+        }
+
+        .table-custom tbody td {
+            padding: 1.2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* ==================== FOOTER ==================== */
+        .footer {
+            background: var(--dark-bg);
+            color: white;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section {
+            margin: 1rem 0;
+        }
+
+        .footer-section h5 {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            margin: 0 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #667eea;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                transition: width 0.3s ease;
+            }
+
+            .sidebar.show {
+                width: 280px;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .workflow-stepper {
+                flex-direction: column;
+            }
+
+            .stepper-step::after {
+                height: 30px;
+                width: 2px;
+                left: 30px;
+                top: 70px;
+            }
+
+            .navbar-custom {
+                padding: 1rem;
+            }
+        }
+
+        /* ==================== ROLE BADGES ==================== */
+        .role-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 5px;
+        }
+
+        .role-student {
+            background: rgba(79, 172, 254, 0.2);
+            color: #0369a1;
+        }
+
+        .role-teacher {
+            background: rgba(16, 185, 129, 0.2);
+            color: #065f46;
+        }
+
+        .role-head {
+            background: rgba(245, 158, 11, 0.2);
+            color: #78350f;
+        }
+
+        .role-dean {
+            background: rgba(239, 68, 68, 0.2);
+            color: #7f1d1d;
+        }
+
+        .role-admin {
+            background: rgba(168, 85, 247, 0.2);
+            color: #4c0519;
+        }
+
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-file-contract"></i>
+                UniDoc
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="fas fa-home"></i> Bosh sahifa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/documents">
+                            <i class="fas fa-file"></i> Hujjatlar
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.role in ['admin', 'dean', 'department_head', 'teacher'] %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/approvals">
+                                    <i class="fas fa-check-circle"></i> Tasdiqlash
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if current_user.role == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admin">
+                                    <i class="fas fa-cog"></i> Boshqaruv
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+
+                {% if current_user.is_authenticated %}
+                    <!-- Notification Bell -->
+                    <div class="notification-bell" id="notificationBell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationCount" style="display: none;">3</span>
+                    </div>
+
+                    <!-- User Dropdown -->
+                    <div class="dropdown ms-3">
+                        <div class="user-avatar" data-bs-toggle="dropdown">
+                            {{ current_user.username[0].upper() }}
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user"></i> Profil</a></li>
+                            <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog"></i> Sozlamalar</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt"></i> Chiqish</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a class="btn btn-primary-gradient ms-2" href="/login">Kirish</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    {% if current_user.is_authenticated %}
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h5>
+                    <i class="fas fa-bars"></i>
+                    Menyu
+                </h5>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="/dashboard" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Bosh paneli</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/documents" class="{% if request.endpoint == 'documents' %}active{% endif %}">
+                        <i class="fas fa-folder"></i>
+                        <span>Mening hujjatlarim</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/create-document" class="{% if request.endpoint == 'create_document' %}active{% endif %}">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Hujjat yaratish</span>
+                    </a>
+                </li>
+
+                {% if current_user.role == 'student' %}
+                    <li><a href="/my-submissions"><i class="fas fa-paper-plane"></i> <span>Yuborilgan hujjatlar</span></a></li>
+                {% elif current_user.role == 'teacher' %}
+                    <li><a href="/my-submissions"><i class="fas fa-paper-plane"></i> <span>Mening hujjatlarim</span></a></li>
+                    <li><a href="/supervise"><i class="fas fa-users"></i> <span>Talabalarimni nazorat qilish</span></a></li>
+                {% elif current_user.role == 'department_head' %}
+                    <li><a href="/my-submissions"><i class="fas fa-paper-plane"></i> <span>Mening hujjatlarim</span></a></li>
+                    <li><a href="/department-docs"><i class="fas fa-building"></i> <span>Kafedra hujjatlari</span></a></li>
+                    <li><a href="/approvals"><i class="fas fa-thumbs-up"></i> <span>Tasdiqlanishi kerak</span></a></li>
+                {% elif current_user.role == 'dean' %}
+                    <li><a href="/my-submissions"><i class="fas fa-paper-plane"></i> <span>Mening hujjatlarim</span></a></li>
+                    <li><a href="/faculty-docs"><i class="fas fa-university"></i> <span>Fakultet hujjatlari</span></a></li>
+                    <li><a href="/approvals"><i class="fas fa-thumbs-up"></i> <span>Tasdiqlanishi kerak</span></a></li>
+                {% elif current_user.role == 'admin' %}
+                    <li><a href="/admin/users"><i class="fas fa-users"></i> <span>Foydalanuvchilar</span></a></li>
+                    <li><a href="/admin/documents"><i class="fas fa-files"></i> <span>Barcha hujjatlar</span></a></li>
+                    <li><a href="/admin/logs"><i class="fas fa-history"></i> <span>Loglar</span></a></li>
+                    <li><a href="/admin/settings"><i class="fas fa-sliders-h"></i> <span>Tizim sozlamalari</span></a></li>
+                {% endif %}
+
+                <li><hr style="margin: 1rem 0; border: none; border-top: 1px solid #e2e8f0;"></li>
+                <li><a href="/help"><i class="fas fa-question-circle"></i> <span>Yordam</span></a></li>
+                <li><a href="/profile"><i class="fas fa-user-circle"></i> <span>Profil</span></a></li>
+            </ul>
+        </aside>
+    {% endif %}
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div class="main-content fade-in">
+        <div class="container-fluid">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% if category == 'success' %}
+                            <div class="alert alert-success-custom alert-custom alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>Muvaffaqiyat!</strong> {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% elif category == 'warning' %}
+                            <div class="alert alert-warning-custom alert-custom alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Ogohlantirish!</strong> {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% elif category == 'danger' %}
+                            <div class="alert alert-danger-custom alert-custom alert-dismissible fade show" role="alert">
+                                <i class="fas fa-times-circle me-2"></i>
+                                <strong>Xato!</strong> {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info-custom alert-custom alert-dismissible fade show" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Page Content -->
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h5><i class="fas fa-graduation-cap"></i> Universitet Hujjat Aylanish Tizimi</h5>
+                <p>Zamonaviy, xavfsiz va samarali hujjat boshqaruv tizimi</p>
+            </div>
+            <div class="footer-section footer-links">
+                <a href="/">Bosh sahifa</a>
+                <a href="/about">Haqimizda</a>
+                <a href="/contact">Aloqa</a>
+                <a href="/privacy">Maxfiylik siyosati</a>
+            </div>
+            <div class="footer-section">
+                <p>&copy; 2025 Universitet Hujjat Aylanish Tizimi. Barcha huquqlar himoyalangan.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Sidebar Toggle
+        const sidebarToggle = document.querySelector('.navbar-toggler');
+        const sidebar = document.getElementById('sidebar');
+
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+            });
+        }
+
+        // Close sidebar when a link is clicked
+        const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        });
+
+        // Active link highlighting
+        const currentPath = window.location.pathname;
+        sidebarLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+
+        // Notification Bell
+        const notificationBell = document.getElementById('notificationBell');
+        if (notificationBell) {
+            notificationBell.addEventListener('click', function() {
+                console.log('Notification bell clicked');
+                // Add your notification logic here
+            });
+        }
+
+        // Auto-hide alerts after 5 seconds
+        document.querySelectorAll('.alert-custom').forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+
+        // Smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+
+    <!-- Additional blocks for child templates -->
+    {% block extra_css %}{% endblock %}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

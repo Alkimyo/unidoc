@@ -1,0 +1,451 @@
+{% extends "base.html" %}
+
+{% block title %}Foydalanuvchilar Boshqaruv - UniDoc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-users-cog me-2"></i> Foydalanuvchilar Boshqaruv</h1>
+    <p>Barcha foydalanuvchilarni boshqarish va rollarni tahrirlash</p>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header card-header-gradient d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-users me-2"></i> Foydalanuvchilar Ro'yxati
+        </h5>
+        <span class="badge bg-light text-dark">{{ users|length }} ta foydalanuvchi</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>FIO</th>
+                        <th>Foydalanuvchi nomi</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Fakultet/Kafedra</th>
+                        <th>Holati</th>
+                        <th>Qo'shilgan sana</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <strong>{{ user.get_full_name() }}</strong>
+                            {% if user.student_id %}
+                            <br><small class="text-muted">ID: {{ user.student_id }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="role-badge role-{{ user.role }}" id="role-badge-{{ user.id }}">
+                                {{ user.role|replace('_', ' ')|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <small>
+                                {% if user.faculty %}<strong>F:</strong> {{ user.faculty }}<br>{% endif %}
+                                {% if user.department %}<strong>K:</strong> {{ user.department }}{% endif %}
+                                {% if user.group %}<br><strong>Guruh:</strong> {{ user.group }}{% endif %}
+                            </small>
+                        </td>
+                        <td>
+                            {% if user.is_active %}
+                                <span class="badge-success">Faol</span>
+                            {% else %}
+                                <span class="badge-warning">Kutilyapti</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.created_at.strftime('%d.%m.%Y') }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewUserDetails({{ user.id }})" title="Ma'lumotlar">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="editUserRole({{ user.id }})" title="Rolni o'zgartirish">
+                                    <i class="fas fa-user-edit"></i>
+                                </button>
+                                {% if not user.is_active %}
+                                <button class="btn btn-sm btn-outline-success" onclick="activateUser({{ user.id }})" title="Faollashtirish">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                {% endif %}
+                                {% if user.id != current_user.id %}
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }})" title="O'chirish">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Foydalanuvchi Ma'lumotlari</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="userDetailsContent">
+                <!-- Ma'lumotlar JavaScript orqali to'ldiriladi -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Role Modal -->
+<div class="modal fade" id="editRoleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Foydalanuvchi Rolini O'zgartirish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editRoleForm">
+                    <input type="hidden" id="editRoleUserId">
+                    <div class="mb-3">
+                        <label for="newRole" class="form-label">Yangi Rol</label>
+                        <select class="form-select" id="newRole" required>
+                            <option value="">Tanlang...</option>
+                            <option value="student">Talaba</option>
+                            <option value="teacher">O'qituvchi</option>
+                            <option value="department_head">Kafedra Mudiri</option>
+                            <option value="dean">Dekan</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-warning-custom alert-custom">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Diqqat!</strong> Rol o'zgartirilgach, foydalanuvchi tizimga qayta kirishi kerak bo'lishi mumkin.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                <button type="button" class="btn btn-warning" id="confirmRoleChange">
+                    <i class="fas fa-save me-2"></i>Rolni Yangilash
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yangi Foydalanuvchi Qo'shish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm" method="POST" action="{{ url_for('admin_add_user') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="add_first_name" class="form-label">Ism *</label>
+                            <input type="text" class="form-control" id="add_first_name" name="first_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="add_last_name" class="form-label">Familiya *</label>
+                            <input type="text" class="form-control" id="add_last_name" name="last_name" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="add_username" class="form-label">Foydalanuvchi nomi *</label>
+                            <input type="text" class="form-control" id="add_username" name="username" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="add_email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="add_email" name="email" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="add_password" class="form-label">Parol *</label>
+                            <input type="password" class="form-control" id="add_password" name="password" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="add_role" class="form-label">Rol *</label>
+                            <select class="form-select" id="add_role" name="role" required>
+                                <option value="student">Talaba</option>
+                                <option value="teacher">O'qituvchi</option>
+                                <option value="department_head">Kafedra Mudiri</option>
+                                <option value="dean">Dekan</option>
+                                <option value="admin">Administrator</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="add_faculty" class="form-label">Fakultet</label>
+                            <select class="form-select" id="add_faculty" name="faculty">
+                                <option value="">Tanlang...</option>
+                                <option value="Technical Sciences">Texnika fanlari</option>
+                                <option value="Natural Sciences">Tabiiy fanlar</option>
+                                <option value="Social Sciences">Ijtimoiy fanlar</option>
+                                <option value="Medical Sciences">Tibbiyot fanlari</option>
+                                <option value="Economics">Iqtisodiyot</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="add_department" class="form-label">Kafedra/Yo'nalish</label>
+                            <select class="form-select" id="add_department" name="department">
+                                <option value="">Tanlang...</option>
+                                <option value="Computer Science">Kompyuter ilmlari</option>
+                                <option value="Software Engineering">Dasturiy injiniring</option>
+                                <option value="Mathematics">Matematika</option>
+                                <option value="Physics">Fizika</option>
+                                <option value="Economics">Iqtisodiyot</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row" id="studentFields">
+                        <div class="col-md-6 mb-3">
+                            <label for="add_student_id" class="form-label">Talaba ID</label>
+                            <input type="text" class="form-control" id="add_student_id" name="student_id">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="add_group" class="form-label">Guruh</label>
+                            <input type="text" class="form-control" id="add_group" name="group">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                <button type="submit" form="addUserForm" class="btn btn-primary-gradient">Qo'shish</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Foydalanuvchi ma'lumotlarini ko'rsatish
+function viewUserDetails(userId) {
+    fetch(`/api/user/${userId}/details`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            
+            const content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Asosiy ma'lumotlar</h6>
+                        <p><strong>FIO:</strong> ${data.first_name} ${data.last_name}</p>
+                        <p><strong>Foydalanuvchi nomi:</strong> ${data.username}</p>
+                        <p><strong>Email:</strong> ${data.email}</p>
+                        <p><strong>Rol:</strong> <span class="role-badge role-${data.role}">${data.role.replace('_', ' ').title()}</span></p>
+                        <p><strong>Holati:</strong> ${data.is_active ? '<span class="badge-success">Faol</span>' : '<span class="badge-warning">Kutilyapti</span>'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Universitet ma'lumotlari</h6>
+                        <p><strong>Fakultet:</strong> ${data.faculty || 'Noma\'lum'}</p>
+                        <p><strong>Kafedra:</strong> ${data.department || 'Noma\'lum'}</p>
+                        ${data.student_id ? `<p><strong>Talaba ID:</strong> ${data.student_id}</p>` : ''}
+                        ${data.group ? `<p><strong>Guruh:</strong> ${data.group}</p>` : ''}
+                        <p><strong>Qo'shilgan sana:</strong> ${data.created_at}</p>
+                        <p><strong>Hujjatlar soni:</strong> ${data.documents_count}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('userDetailsContent').innerHTML = content;
+            const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ma\'lumotlarni yuklashda xatolik yuz berdi');
+        });
+}
+
+// Rolni o'zgartirish modalini ochish
+function editUserRole(userId) {
+    document.getElementById('editRoleUserId').value = userId;
+    
+    // Foydalanuvchi ma'lumotlarini yuklash
+    fetch(`/api/user/${userId}/details`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            
+            // Joriy rolni tanlash
+            document.getElementById('newRole').value = data.role;
+            
+            const modal = new bootstrap.Modal(document.getElementById('editRoleModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ma\'lumotlarni yuklashda xatolik yuz berdi');
+        });
+}
+
+// Rolni yangilash
+document.getElementById('confirmRoleChange').addEventListener('click', function() {
+    const userId = document.getElementById('editRoleUserId').value;
+    const newRole = document.getElementById('newRole').value;
+    
+    if (!newRole) {
+        alert('Iltimos, yangi rolni tanlang!');
+        return;
+    }
+    
+    fetch(`/admin/users/${userId}/update-role`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            role: newRole
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            
+            // Rol badge ni yangilash
+            const roleBadge = document.getElementById(`role-badge-${userId}`);
+            roleBadge.textContent = data.new_role_display;
+            roleBadge.className = `role-badge role-${data.new_role}`;
+            
+            bootstrap.Modal.getInstance(document.getElementById('editRoleModal')).hide();
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Xatolik yuz berdi');
+    });
+});
+
+// Faollashtirish
+function activateUser(userId) {
+    if (confirm('Bu foydalanuvchini faollashtirishni tasdiqlaysizmi?')) {
+        fetch(`/admin/users/${userId}/activate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.error);
+            }
+        });
+    }
+}
+
+// O'chirish
+function deleteUser(userId) {
+    if (confirm('Bu foydalanuvchini o\'chirishni tasdiqlaysizmi? Bu amalni ortga qaytarib bo\'lmaydi!')) {
+        fetch(`/admin/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.error);
+            }
+        });
+    }
+}
+
+// Yangi foydalanuvchi qo'shish modalida talaba maydonlarini boshqarish
+document.getElementById('add_role').addEventListener('change', function() {
+    const studentFields = document.getElementById('studentFields');
+    if (this.value === 'student') {
+        studentFields.style.display = 'flex';
+        document.getElementById('add_student_id').required = true;
+        document.getElementById('add_group').required = true;
+    } else {
+        studentFields.style.display = 'none';
+        document.getElementById('add_student_id').required = false;
+        document.getElementById('add_group').required = false;
+    }
+});
+
+// Yangi foydalanuvchi qo'shish formasi
+document.getElementById('addUserForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch(this.action, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+            location.reload();
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Xatolik yuz berdi');
+    });
+});
+</script>
+
+<style>
+.role-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.role-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Tizim Sozlamalari - UniDoc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-sliders-h me-2"></i> Tizim Sozlamalari</h1>
+    <p>Tizim global sozlamalari va konfiguratsiyasi</p>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cog me-2"></i> Umumiy Sozlamalar
+                </h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="site_name" class="form-label">Sayt nomi</label>
+                        <input type="text" class="form-control" id="site_name" value="UniDoc - Hujjat Aylanish Tizimi">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="admin_email" class="form-label">Admin email</label>
+                        <input type="email" class="form-control" id="admin_email" value="admin@university.uz">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="max_file_size" class="form-label">Maksimal fayl hajmi (MB)</label>
+                        <input type="number" class="form-control" id="max_file_size" value="10">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="auto_logout" class="form-label">Avtomatik chiqish (daqiqa)</label>
+                        <input type="number" class="form-control" id="auto_logout" value="60">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-gradient">
+                        <i class="fas fa-save me-2"></i>Sozlamalarni Saqlash
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bell me-2"></i> Bildirishnoma Sozlamalari
+                </h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="email_notifications" checked>
+                        <label class="form-check-label" for="email_notifications">
+                            Email bildirishnomalari
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="new_user_notifications" checked>
+                        <label class="form-check-label" for="new_user_notifications">
+                            Yangi foydalanuvchi haqida bildirish
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="document_approval_notifications" checked>
+                        <label class="form-check-label" for="document_approval_notifications">
+                            Hujjat tasdiqlash bildirishnomalari
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="system_errors_notifications">
+                        <label class="form-check-label" for="system_errors_notifications">
+                            Tizim xatolari haqida bildirish
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-gradient">
+                        <i class="fas fa-save me-2"></i>Sozlamalarni Saqlash
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

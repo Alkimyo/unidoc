@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Bosh Panel - UniDoc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-chart-line me-2"></i> Bosh Panel</h1>
+    <p>Xush kelibsiz, {{ current_user.get_full_name() }}!</p>
+</div>
+
+<div class="row">
+    <!-- Statistikalar -->
+    <div class="col-md-3 mb-4">
+        <div class="card card-custom">
+            <div class="card-body text-center">
+                <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                <h3>{{ user_docs }}</h3>
+                <p class="text-muted">Jami Hujjatlar</p>
+            </div>
+        </div>
+    </div>
+    
+    {% if current_user.role in ['teacher', 'department_head', 'dean'] %}
+    <div class="col-md-3 mb-4">
+        <div class="card card-custom">
+            <div class="card-body text-center">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <h3>{{ pending_approvals }}</h3>
+                <p class="text-muted">Kutayotgan Tasdiqlar</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="col-md-3 mb-4">
+        <div class="card card-custom">
+            <div class="card-body text-center">
+                <i class="fas fa-clock fa-3x text-warning mb-3"></i>
+                <h3>0</h3>
+                <p class="text-muted">Jarayondagi Hujjatlar</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card card-custom">
+            <div class="card-body text-center">
+                <i class="fas fa-check-double fa-3x text-info mb-3"></i>
+                <h3>0</h3>
+                <p class="text-muted">Tasdiqlangan Hujjatlar</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- So'nggi hujjatlar -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i> So'nggi Hujjatlar
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_docs %}
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Nomi</th>
+                                <th>Turi</th>
+                                <th>Holati</th>
+                                <th>Sana</th>
+                                <th>Amallar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in recent_docs %}
+                            <tr>
+                                <td>{{ doc.title }}</td>
+                                <td>{{ doc.document_type }}</td>
+                                <td>
+                                    {% if doc.status == 'draft' %}
+                                        <span class="badge-warning">Qoralama</span>
+                                    {% elif doc.status == 'submitted' %}
+                                        <span class="badge-info">Yuborilgan</span>
+                                    {% elif doc.status == 'approved' %}
+                                        <span class="badge-success">Tasdiqlangan</span>
+                                    {% else %}
+                                        <span class="badge-secondary">{{ doc.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ doc.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-primary-gradient">Ko'rish</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Hali hech qanday hujjat mavjud emas</p>
+                    <a href="{{ url_for('create_document') }}" class="btn btn-primary-gradient">
+                        <i class="fas fa-plus me-2"></i> Hujjat Yaratish
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tezkor Amallar -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt me-2"></i> Tezkor Amallar
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center mb-3">
+                        <a href="{{ url_for('create_document') }}" class="btn btn-accent-gradient btn-lg w-100">
+                            <i class="fas fa-plus-circle me-2"></i> Yangi Hujjat
+                        </a>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <a href="{{ url_for('documents') }}" class="btn btn-primary-gradient btn-lg w-100">
+                            <i class="fas fa-folder me-2"></i> Mening Hujjatlarim
+                        </a>
+                    </div>
+                    {% if current_user.role in ['teacher', 'department_head', 'dean'] %}
+                    <div class="col-md-3 text-center mb-3">
+                        <a href="{{ url_for('approvals') }}" class="btn btn-secondary-gradient btn-lg w-100">
+                            <i class="fas fa-check-circle me-2"></i> Tasdiqlash
+                        </a>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-3 text-center mb-3">
+                        <a href="{{ url_for('profile') }}" class="btn btn-outline-primary btn-lg w-100">
+                            <i class="fas fa-user me-2"></i> Profil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

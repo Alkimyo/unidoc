@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Tasdiqlash - UniDoc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-check-circle me-2"></i> Tasdiqlash</h1>
+    <p>Tasdiqlanishi kerak bo'lgan hujjatlar ro'yxati</p>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header card-header-gradient d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-list me-2"></i> Tasdiqlanishi Kerak Bo'lgan Hujjatlar
+        </h5>
+        <span class="badge bg-light text-dark">{{ pending_docs|length }} ta hujjat</span>
+    </div>
+    <div class="card-body">
+        {% if pending_docs %}
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Hujjat Nomi</th>
+                        <th>Muallif</th>
+                        <th>Turi</th>
+                        <th>Yuborilgan Sana</th>
+                        <th>Joriy Holati</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in pending_docs %}
+                    <tr>
+                        <td>
+                            <strong>{{ doc.title }}</strong>
+                            {% if doc.description %}
+                            <br><small class="text-muted">{{ doc.description[:50] }}...</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ doc.author.get_full_name() }}</td>
+                        <td>{{ doc.document_type }}</td>
+                        <td>{{ doc.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            {% if doc.status == 'submitted' %}
+                                <span class="badge-info">Rahbar tasdiqlashi kerak</span>
+                            {% elif doc.status == 'supervisor_approved' %}
+                                <span class="badge-primary">Kafedra tasdiqlashi kerak</span>
+                            {% elif doc.status == 'department_approved' %}
+                                <span class="badge-primary">Dekan tasdiqlashi kerak</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewDocument({{ doc.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" onclick="approveDocument({{ doc.id }})">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="rejectDocument({{ doc.id }})">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-check-circle fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">Hozircha tasdiqlanishi kerak bo'lgan hujjatlar yo'q</h4>
+            <p class="text-muted">Barcha hujjatlar tasdiqlangan yoki hali yangi hujjatlar yuborilmagan</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Approval Modal -->
+<div class="modal fade" id="approvalModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header card-header-gradient text-white">
+                <h5 class="modal-title" id="approvalModalTitle">Hujjatni Tasdiqlash</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="approvalForm">
+                    <input type="hidden" id="documentId">
+                    <input type="hidden" id="approvalAction">
+                    
+                    <div class="mb-3">
+                        <label for="comments" class="form-label">Izoh (ixtiyoriy)</label>
+                        <textarea class="form-control" id="comments" rows="3" 
+                                  placeholder="Tasdiqlash yoki rad etish sabablari..."></textarea>
+                    </div>
+                    
+                    <div id="approvalPreview" class="border p-3 rounded mb-3" style="display: none;">
+                        <h6>Hujjat ma'lumotlari:</h6>
+                        <p id="previewContent"></p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                <button type="button" class="btn btn-success" id="confirmApproveBtn" style="display: none;">
+                    <i class="fas fa-check me-2"></i>Tasdiqlash
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmRejectBtn" style="display: none;">
+                    <i class="fas fa-times me-2"></i>Rad etish
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewDocument(docId) {
+    // Hujjatni ko'rish logikasi
+    alert('Hujjat ID: ' + docId + ' ko\'rish funksiyasi ishga tushadi');
+}
+
+function approveDocument(docId) {
+    document.getElementById('documentId').value = docId;
+    document.getElementById('approvalAction').value = 'approve';
+    document.getElementById('approvalModalTitle').textContent = 'Hujjatni Tasdiqlash';
+    document.getElementById('confirmApproveBtn').style.display = 'inline-block';
+    document.getElementById('confirmRejectBtn').style.display = 'none';
+    
+    // Hujjat ma'lumotlarini yuklash
+    fetch(`/api/document/${docId}/details`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('previewContent').innerHTML = 
+                `<strong>Nomi:</strong> ${data.title}<br>
+                 <strong>Muallif:</strong> ${data.author}<br>
+                 <strong>Turi:</strong> ${data.type}`;
+            document.getElementById('approvalPreview').style.display = 'block';
+        });
+    
+    const modal = new bootstrap.Modal(document.getElementById('approvalModal'));
+    modal.show();
+}
+
+function rejectDocument(docId) {
+    document.getElementById('documentId').value = docId;
+    document.getElementById('approvalAction').value = 'reject';
+    document.getElementById('approvalModalTitle').textContent = 'Hujjatni Rad Etish';
+    document.getElementById('confirmApproveBtn').style.display = 'none';
+    document.getElementById('confirmRejectBtn').style.display = 'inline-block';
+    
+    const modal = new bootstrap.Modal(document.getElementById('approvalModal'));
+    modal.show();
+}
+
+// Tasdiqlash/Rad etish tugmalarini ishga tushirish
+document.getElementById('confirmApproveBtn').addEventListener('click', function() {
+    const docId = document.getElementById('documentId').value;
+    const comments = document.getElementById('comments').value;
+    
+    fetch(`/api/document/${docId}/approve`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            approval_type: '{{ current_user.role }}',
+            comments: comments
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+            bootstrap.Modal.getInstance(document.getElementById('approvalModal')).hide();
+            location.reload();
+        } else {
+            alert(data.error || 'Xatolik yuz berdi');
+        }
+    });
+});
+
+document.getElementById('confirmRejectBtn').addEventListener('click', function() {
+    const docId = document.getElementById('documentId').value;
+    const comments = document.getElementById('comments').value;
+    
+    // Rad etish API chaqiruvi
+    alert('Rad etish funksiyasi: ' + docId + ' - ' + comments);
+    bootstrap.Modal.getInstance(document.getElementById('approvalModal')).hide();
+});
+</script>
+{% endblock %}
