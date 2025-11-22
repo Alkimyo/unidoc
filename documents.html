@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Mening Hujjatlarim - UniDoc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-folder me-2"></i> Mening Hujjatlarim</h1>
+    <p>Barcha yaratilgan va yuborilgan hujjatlaringiz</p>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header card-header-gradient d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-list me-2"></i> Hujjatlar Ro'yxati
+        </h5>
+        <a href="{{ url_for('create_document') }}" class="btn btn-accent-gradient">
+            <i class="fas fa-plus me-2"></i> Yangi Hujjat
+        </a>
+    </div>
+    <div class="card-body">
+        {% if documents %}
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Nomi</th>
+                        <th>Turi</th>
+                        <th>Holati</th>
+                        <th>Yaratilgan Sana</th>
+                        <th>Oxirgi O'zgartirish</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <td>{{ doc.title }}</td>
+                        <td>{{ doc.document_type }}</td>
+                        <td>
+                            {% if doc.status == 'draft' %}
+                                <span class="badge-warning">Qoralama</span>
+                            {% elif doc.status == 'submitted' %}
+                                <span class="badge-info">Yuborilgan</span>
+                            {% elif doc.status == 'supervisor_approved' %}
+                                <span class="badge-primary">Rahbar Tasdiqladi</span>
+                            {% elif doc.status == 'department_approved' %}
+                                <span class="badge-primary">Kafedra Tasdiqladi</span>
+                            {% elif doc.status == 'approved' %}
+                                <span class="badge-success">Tasdiqlangan</span>
+                            {% elif doc.status == 'rejected' %}
+                                <span class="badge-danger">Rad Etilgan</span>
+                            {% else %}
+                                <span class="badge-secondary">{{ doc.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ doc.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ doc.updated_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary">Ko'rish</button>
+                                {% if doc.status == 'draft' %}
+                                <button class="btn btn-sm btn-outline-success" onclick="submitDocument({{ doc.id }})">Yuborish</button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">Hali hech qanday hujjat mavjud emas</h4>
+            <p class="text-muted mb-4">Birinchi hujjatingizni yaratish uchun quyidagi tugmani bosing</p>
+            <a href="{{ url_for('create_document') }}" class="btn btn-primary-gradient btn-lg">
+                <i class="fas fa-plus me-2"></i> Hujjat Yaratish
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function submitDocument(docId) {
+    if (confirm('Hujjatni yuborishni tasdiqlaysizmi? Yuborilgandan so\'ng tahrirlash mumkin emas.')) {
+        fetch(`/api/document/${docId}/submit`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.error || 'Xatolik yuz berdi');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Xatolik yuz berdi');
+        });
+    }
+}
+</script>
+{% endblock %}

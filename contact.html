@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Aloqa - UniDoc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-envelope me-2"></i> Aloqa</h1>
+    <p>Biz bilan bog'laning</p>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">Xabar Yuborish</h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="contactName" class="form-label">Ism *</label>
+                            <input type="text" class="form-control" id="contactName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="contactEmail" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="contactEmail" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contactSubject" class="form-label">Mavzu *</label>
+                        <input type="text" class="form-control" id="contactSubject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contactMessage" class="form-label">Xabar *</label>
+                        <textarea class="form-control" id="contactMessage" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary-gradient">
+                        <i class="fas fa-paper-plane me-2"></i>Xabarni Yuborish
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">Aloqa Ma'lumotlari</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6><i class="fas fa-map-marker-alt me-2 text-primary"></i> Manzil</h6>
+                    <p class="text-muted">Universitet shaharchasi, Toshkent shahri</p>
+                </div>
+                <div class="mb-4">
+                    <h6><i class="fas fa-phone me-2 text-primary"></i> Telefon</h6>
+                    <p class="text-muted">+998 71 123 45 67</p>
+                </div>
+                <div class="mb-4">
+                    <h6><i class="fas fa-envelope me-2 text-primary"></i> Email</h6>
+                    <p class="text-muted">info@university.uz</p>
+                </div>
+                <div class="mb-4">
+                    <h6><i class="fas fa-clock me-2 text-primary"></i> Ish vaqti</h6>
+                    <p class="text-muted">Dushanba - Juma: 9:00 - 18:00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

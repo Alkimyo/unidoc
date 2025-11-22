@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Ro'yxatdan o'tish - UniDoc{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient text-center">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-user-plus me-2"></i>Talaba Ro'yxatdan o'tish
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info-custom alert-custom mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Diqqat!</strong> Ro'yxatdan o'tish faqat talabalar uchun. Boshqa rollar (o'qituvchi, kafedra mudiri, dekan) faqat administrator tomonidan qo'shiladi.
+                </div>
+
+                <form method="POST" action="{{ url_for('register') }}">
+                    <!-- Shaxsiy ma'lumotlar -->
+                    <h5 class="mb-3 text-primary">
+                        <i class="fas fa-user me-2"></i>Shaxsiy Ma'lumotlar
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">Ism <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" 
+                                   value="{{ request.form.first_name if request.form }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Familiya <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" 
+                                   value="{{ request.form.last_name if request.form }}" required>
+                        </div>
+                    </div>
+
+                    <!-- Talaba ma'lumotlari -->
+                    <h5 class="mb-3 mt-4 text-primary">
+                        <i class="fas fa-graduation-cap me-2"></i>Talaba Ma'lumotlari
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="student_id" class="form-label">Talaba ID <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                <input type="text" class="form-control" id="student_id" name="student_id" 
+                                       value="{{ request.form.student_id if request.form }}" required
+                                       placeholder="Masalan: 1234567">
+                            </div>
+                            <div class="form-text">Universitet tomonidan berilgan talaba ID raqamingiz</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="group" class="form-label">Guruh <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-users"></i></span>
+                                <input type="text" class="form-control" id="group" name="group" 
+                                       value="{{ request.form.group if request.form }}" required
+                                       placeholder="Masalan: 101-22">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="faculty" class="form-label">Fakultet <span class="text-danger">*</span></label>
+                            <select class="form-select" id="faculty" name="faculty" required>
+                                <option value="">Tanlang...</option>
+                                <option value="Technical Sciences" {% if request.form and request.form.faculty == 'Technical Sciences' %}selected{% endif %}>Texnika fanlari</option>
+                                <option value="Natural Sciences" {% if request.form and request.form.faculty == 'Natural Sciences' %}selected{% endif %}>Tabiiy fanlar</option>
+                                <option value="Social Sciences" {% if request.form and request.form.faculty == 'Social Sciences' %}selected{% endif %}>Ijtimoiy fanlar</option>
+                                <option value="Medical Sciences" {% if request.form and request.form.faculty == 'Medical Sciences' %}selected{% endif %}>Tibbiyot fanlari</option>
+                                <option value="Economics" {% if request.form and request.form.faculty == 'Economics' %}selected{% endif %}>Iqtisodiyot</option>
+                                <option value="Philology" {% if request.form and request.form.faculty == 'Philology' %}selected{% endif %}>Filologiya</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="department" class="form-label">Yo'nalish <span class="text-danger">*</span></label>
+                            <select class="form-select" id="department" name="department" required>
+                                <option value="">Tanlang...</option>
+                                <option value="Computer Science" {% if request.form and request.form.department == 'Computer Science' %}selected{% endif %}>Kompyuter ilmlari</option>
+                                <option value="Software Engineering" {% if request.form and request.form.department == 'Software Engineering' %}selected{% endif %}>Dasturiy injiniring</option>
+                                <option value="Information Security" {% if request.form and request.form.department == 'Information Security' %}selected{% endif %}>Axborot xavfsizligi</option>
+                                <option value="Mathematics" {% if request.form and request.form.department == 'Mathematics' %}selected{% endif %}>Matematika</option>
+                                <option value="Physics" {% if request.form and request.form.department == 'Physics' %}selected{% endif %}>Fizika</option>
+                                <option value="Chemistry" {% if request.form and request.form.department == 'Chemistry' %}selected{% endif %}>Kimyo</option>
+                                <option value="Biology" {% if request.form and request.form.department == 'Biology' %}selected{% endif %}>Biologiya</option>
+                                <option value="Economics" {% if request.form and request.form.department == 'Economics' %}selected{% endif %}>Iqtisodiyot</option>
+                                <option value="Business Administration" {% if request.form and request.form.department == 'Business Administration' %}selected{% endif %}>Biznes boshqaruvi</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Hisob ma'lumotlari -->
+                    <h5 class="mb-3 mt-4 text-primary">
+                        <i class="fas fa-key me-2"></i>Hisob Ma'lumotlari
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">Foydalanuvchi nomi <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                       value="{{ request.form.username if request.form }}" required
+                                       pattern="[a-zA-Z0-9_]+" title="Faqat harflar, raqamlar va pastki chiziq">
+                            </div>
+                            <div class="form-text">Faqat harflar, raqamlar va pastki chiziq</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email manzil <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ request.form.email if request.form }}" required>
+                            </div>
+                            <div class="form-text">Universitet email manzilingiz (masalan: talaba@university.uz)</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="password" class="form-label">Parol <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <div class="form-text">Kamida 6 belgi</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="confirm_password" class="form-label">Parolni tasdiqlash <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rozilik -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agree_terms" name="agree_terms" required>
+                            <label class="form-check-label" for="agree_terms">
+                                Men <a href="/privacy" target="_blank">foydalanish shartlari</a> va 
+                                <a href="/privacy" target="_blank">maxfiylik siyosati</a> bilan tanishdim va roziman
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Hidden field for role -->
+                    <input type="hidden" name="role" value="student">
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary-gradient">
+                            <i class="fas fa-user-plus me-2"></i>Ro'yxatdan o'tish
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <p>Allaqachon hisobingiz bormi? <a href="{{ url_for('login') }}">Tizimga kiring</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Formani yuborishdan oldin tekshirish
+document.querySelector('form').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        alert('Parollar mos kelmadi!');
+        return false;
+    }
+    
+    if (password.length < 6) {
+        e.preventDefault();
+        alert('Parol kamida 6 belgidan iborat bo\'lishi kerak!');
+        return false;
+    }
+
+    // Talaba ID formatini tekshirish (ixtiyoriy)
+    const studentId = document.getElementById('student_id').value;
+    if (!/^\d+$/.test(studentId)) {
+        e.preventDefault();
+        alert('Talaba ID faqat raqamlardan iborat bo\'lishi kerak!');
+        return false;
+    }
+});
+</script>
+{% endblock %}

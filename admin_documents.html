@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}Barcha Hujjatlar - UniDoc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-files me-2"></i> Barcha Hujjatlar</h1>
+    <p>Tizimdagi barcha hujjatlarni ko'rish va boshqarish</p>
+</div>
+
+<!-- Filtrlar -->
+<div class="card card-custom mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('admin_documents') }}" class="row g-3">
+            <div class="col-md-3">
+                <label for="status" class="form-label">Holati</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">Barchasi</option>
+                    <option value="draft" {% if request.args.get('status') == 'draft' %}selected{% endif %}>Qoralama</option>
+                    <option value="submitted" {% if request.args.get('status') == 'submitted' %}selected{% endif %}>Yuborilgan</option>
+                    <option value="supervisor_approved" {% if request.args.get('status') == 'supervisor_approved' %}selected{% endif %}>Rahbar Tasdiqlagan</option>
+                    <option value="department_approved" {% if request.args.get('status') == 'department_approved' %}selected{% endif %}>Kafedra Tasdiqlagan</option>
+                    <option value="approved" {% if request.args.get('status') == 'approved' %}selected{% endif %}>Tasdiqlangan</option>
+                    <option value="rejected" {% if request.args.get('status') == 'rejected' %}selected{% endif %}>Rad Etilgan</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="document_type" class="form-label">Hujjat turi</label>
+                <select class="form-select" id="document_type" name="document_type">
+                    <option value="">Barchasi</option>
+                    <option value="diploma_project" {% if request.args.get('document_type') == 'diploma_project' %}selected{% endif %}>Diplom loyihasi</option>
+                    <option value="scientific_article" {% if request.args.get('document_type') == 'scientific_article' %}selected{% endif %}>Ilmiy maqola</option>
+                    <option value="course_work" {% if request.args.get('document_type') == 'course_work' %}selected{% endif %}>Kurs ishi</option>
+                    <option value="thesis" {% if request.args.get('document_type') == 'thesis' %}selected{% endif %}>Magistrlik dissertatsiyasi</option>
+                    <option value="report" {% if request.args.get('document_type') == 'report' %}selected{% endif %}>Hisobot</option>
+                    <option value="application" {% if request.args.get('document_type') == 'application' %}selected{% endif %}>Ariza</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="faculty" class="form-label">Fakultet</label>
+                <select class="form-select" id="faculty" name="faculty">
+                    <option value="">Barchasi</option>
+                    <option value="Technical Sciences" {% if request.args.get('faculty') == 'Technical Sciences' %}selected{% endif %}>Texnika fanlari</option>
+                    <option value="Natural Sciences" {% if request.args.get('faculty') == 'Natural Sciences' %}selected{% endif %}>Tabiiy fanlar</option>
+                    <option value="Social Sciences" {% if request.args.get('faculty') == 'Social Sciences' %}selected{% endif %}>Ijtimoiy fanlar</option>
+                    <option value="Medical Sciences" {% if request.args.get('faculty') == 'Medical Sciences' %}selected{% endif %}>Tibbiyot fanlari</option>
+                    <option value="Economics" {% if request.args.get('faculty') == 'Economics' %}selected{% endif %}>Iqtisodiyot</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary-gradient">
+                        <i class="fas fa-filter me-2"></i>Filtr
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header card-header-gradient d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-list me-2"></i> Hujjatlar Ro'yxati
+        </h5>
+        <span class="badge bg-light text-dark">{{ documents|length }} ta hujjat</span>
+    </div>
+    <div class="card-body">
+        {% if documents %}
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Nomi</th>
+                        <th>Muallif</th>
+                        <th>Turi</th>
+                        <th>Fakultet/Kafedra</th>
+                        <th>Holati</th>
+                        <th>Yaratilgan</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <td>
+                            <strong>{{ doc.title }}</strong>
+                            {% if doc.description %}
+                            <br><small class="text-muted">{{ doc.description[:50] }}{% if doc.description|length > 50 %}...{% endif %}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ doc.author.get_full_name() }}
+                            <br>
+                            <small class="text-muted">
+                                <span class="role-badge role-{{ doc.author.role }}">
+                                    {{ doc.author.role|replace('_', ' ')|title }}
+                                </span>
+                            </small>
+                        </td>
+                        <td>
+                            {% if doc.document_type == 'diploma_project' %}
+                                Diplom loyihasi
+                            {% elif doc.document_type == 'scientific_article' %}
+                                Ilmiy maqola
+                            {% elif doc.document_type == 'course_work' %}
+                                Kurs ishi
+                            {% elif doc.document_type == 'thesis' %}
+                                Magistrlik
+                            {% elif doc.document_type == 'report' %}
+                                Hisobot
+                            {% elif doc.document_type == 'application' %}
+                                Ariza
+                            {% else %}
+                                {{ doc.document_type }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small>
+                                <strong>F:</strong> {{ doc.author.faculty or 'Noma\'lum' }}<br>
+                                <strong>K:</strong> {{ doc.author.department or 'Noma\'lum' }}
+                            </small>
+                        </td>
+                        <td>
+                            {% if doc.status == 'draft' %}
+                                <span class="badge-warning">Qoralama</span>
+                            {% elif doc.status == 'submitted' %}
+                                <span class="badge-info">Yuborilgan</span>
+                            {% elif doc.status == 'supervisor_approved' %}
+                                <span class="badge-primary">Rahbar Tasdiqladi</span>
+                            {% elif doc.status == 'department_approved' %}
+                                <span class="badge-primary">Kafedra Tasdiqladi</span>
+                            {% elif doc.status == 'approved' %}
+                                <span class="badge-success">Tasdiqlangan</span>
+                            {% elif doc.status == 'rejected' %}
+                                <span class="badge-danger">Rad Etilgan</span>
+                            {% else %}
+                                <span class="badge-secondary">{{ doc.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small>{{ doc.created_at.strftime('%d.%m.%Y') }}</small>
+                            <br>
+                            <small class="text-muted">{{ doc.created_at.strftime('%H:%M') }}</small>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewDocument({{ doc.id }})" title="Ko'rish">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info" onclick="viewDocumentDetails({{ doc.id }})" title="Batafsil">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                                {% if doc.status != 'approved' and doc.status != 'rejected' %}
+                                <button class="btn btn-sm btn-outline-success" onclick="forceApprove({{ doc.id }})" title="Majburiy tasdiqlash">
+                                    <i class="fas fa-check-double"></i>
+                                </button>
+                                {% endif %}
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument({{ doc.id }})" title="O'chirish">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">Hozircha hech qanday hujjat mavjud emas</h4>
+            <p class="text-muted">Foydalanuvchilar hujjat yaratgach, ular shu yerda ko'rinadi</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Document Details Modal -->
+<div class="modal fade" id="documentDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header card-header-gradient text-white">
+                <h5 class="modal-title">Hujjat Tafsilotlari</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="documentDetailsContent">
+                <!-- Ma'lumotlar JavaScript orqali to'ldiriladi -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Force Approve Modal -->
+<div class="modal fade" id="forceApproveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header card-header-gradient text-white">
+                <h5 class="modal-title">Hujjatni Majburiy Tasdiqlash</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Ushbu hujjatni barcha bosqichlarni o'tkazib, to'g'ridan-to'g'ri tasdiqlashni tasdiqlaysizmi?</p>
+                <form id="forceApproveForm">
+                    <input type="hidden" id="forceApproveDocId">
+                    <div class="mb-3">
+                        <label for="adminComment" class="form-label">Izoh (ixtiyoriy)</label>
+                        <textarea class="form-control" id="adminComment" rows="3" placeholder="Tasdiqlash sababi..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                <button type="button" class="btn btn-success" id="confirmForceApprove">
+                    <i class="fas fa-check-double me-2"></i>Tasdiqlash
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewDocument(docId) {
+    // Hujjatni ko'rish - oddiy ko'rinish
+    alert('Hujjat ID: ' + docId + ' ko\'rish funksiyasi ishga tushadi');
+}
+
+function viewDocumentDetails(docId) {
+    // Hujjat tafsilotlarini yuklash
+    fetch(`/api/document/${docId}/admin-details`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            
+            const content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Asosiy ma'lumotlar</h6>
+                        <p><strong>Nomi:</strong> ${data.title}</p>
+                        <p><strong>Turi:</strong> ${data.type}</p>
+                        <p><strong>Holati:</strong> <span class="badge badge-${data.status_class}">${data.status_text}</span></p>
+                        <p><strong>Yaratilgan:</strong> ${data.created_at}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Muallif ma'lumotlari</h6>
+                        <p><strong>FIO:</strong> ${data.author_name}</p>
+                        <p><strong>Rol:</strong> ${data.author_role}</p>
+                        <p><strong>Fakultet:</strong> ${data.faculty}</p>
+                        <p><strong>Kafedra:</strong> ${data.department}</p>
+                        ${data.student_id ? `<p><strong>Talaba ID:</strong> ${data.student_id}</p>` : ''}
+                        ${data.group ? `<p><strong>Guruh:</strong> ${data.group}</p>` : ''}
+                    </div>
+                </div>
+                ${data.description ? `
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Tavsif</h6>
+                        <p>${data.description}</p>
+                    </div>
+                </div>
+                ` : ''}
+                ${data.approvals && data.approvals.length > 0 ? `
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Tasdiqlash tarixi</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Tasdiqlovchi</th>
+                                        <th>Rol</th>
+                                        <th>Holati</th>
+                                        <th>Izoh</th>
+                                        <th>Sana</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.approvals.map(approval => `
+                                        <tr>
+                                            <td>${approval.approver_name}</td>
+                                            <td>${approval.approval_type}</td>
+                                            <td><span class="badge badge-${approval.status_class}">${approval.status}</span></td>
+                                            <td>${approval.comments || '-'}</td>
+                                            <td>${approval.date}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('documentDetailsContent').innerHTML = content;
+            const modal = new bootstrap.Modal(document.getElementById('documentDetailsModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ma\'lumotlarni yuklashda xatolik yuz berdi');
+        });
+}
+
+function forceApprove(docId) {
+    document.getElementById('forceApproveDocId').value = docId;
+    const modal = new bootstrap.Modal(document.getElementById('forceApproveModal'));
+    modal.show();
+}
+
+function deleteDocument(docId) {
+    if (confirm('Ushbu hujjatni o\'chirishni tasdiqlaysizmi? Bu amalni ortga qaytarib bo\'lmaydi!')) {
+        fetch(`/admin/documents/${docId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Xatolik yuz berdi');
+        });
+    }
+}
+
+// Force approve confirmation
+document.getElementById('confirmForceApprove').addEventListener('click', function() {
+    const docId = document.getElementById('forceApproveDocId').value;
+    const comment = document.getElementById('adminComment').value;
+    
+    fetch(`/admin/documents/${docId}/force-approve`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            comment: comment
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            bootstrap.Modal.getInstance(document.getElementById('forceApproveModal')).hide();
+            location.reload();
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Xatolik yuz berdi');
+    });
+});
+</script>
+{% endblock %}

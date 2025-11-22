@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}Hujjat Yaratish - UniDoc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-plus-circle me-2"></i> 
+        {% if current_user.role == 'student' %}
+            Yangi Hujjat Yaratish
+        {% elif current_user.role == 'teacher' %}
+            Yangi Hujjat Yaratish (O'zim yoki Talaba uchun)
+        {% elif current_user.role == 'department_head' %}
+            Yangi Hujjat Yaratish (Kafedra uchun)
+        {% elif current_user.role == 'dean' %}
+            Yangi Hujjat Yaratish (Fakultet uchun)
+        {% elif current_user.role == 'admin' %}
+            Yangi Hujjat Yaratish (Har qanday foydalanuvchi uchun)
+        {% endif %}
+    </h1>
+    <p>
+        {% if current_user.role == 'student' %}
+            O'zingiz uchun yangi hujjat yarating
+        {% elif current_user.role == 'teacher' %}
+            O'zingiz yoki talabalar uchun hujjat yarating
+        {% elif current_user.role == 'department_head' %}
+            Kafedra doirasida hujjat yarating
+        {% elif current_user.role == 'dean' %}
+            Fakultet doirasida hujjat yarating
+        {% elif current_user.role == 'admin' %}
+            Har qanday foydalanuvchi uchun hujjat yarating
+        {% endif %}
+    </p>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-edit me-2"></i> Hujjat Ma'lumotlari
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('create_document') }}" id="documentForm">
+                    <!-- Muallifni tanlash (faqat admin, o'qituvchi, kafedra mudiri, dekan uchun) -->
+                    {% if current_user.role in ['admin', 'teacher', 'department_head', 'dean'] %}
+                    <div class="mb-3" id="authorSelection">
+                        <label for="author_id" class="form-label">Muallif <span class="text-danger">*</span></label>
+                        <select class="form-select" id="author_id" name="author_id" required>
+                            <option value="{{ current_user.id }}" selected>O'zim ({{ current_user.get_full_name() }})</option>
+                            {% if current_user.role == 'teacher' %}
+                                <!-- O'qituvchi uchun - faqat o'z talabalari -->
+                                {% for student in get_my_students() %}
+                                <option value="{{ student.id }}">{{ student.get_full_name() }} ({{ student.student_id }}) - {{ student.group }}</option>
+                                {% endfor %}
+                            {% elif current_user.role == 'department_head' %}
+                                <!-- Kafedra mudiri uchun - kafedradagi barcha foydalanuvchilar -->
+                                {% for user in get_department_users() %}
+                                <option value="{{ user.id }}">{{ user.get_full_name() }} - {{ user.role|replace('_', ' ')|title }}{% if user.student_id %} ({{ user.student_id }}){% endif %}</option>
+                                {% endfor %}
+                            {% elif current_user.role == 'dean' %}
+                                <!-- Dekan uchun - fakultetdagi barcha foydalanuvchilar -->
+                                {% for user in get_faculty_users() %}
+                                <option value="{{ user.id }}">{{ user.get_full_name() }} - {{ user.role|replace('_', ' ')|title }}{% if user.student_id %} ({{ user.student_id }}){% endif %}</option>
+                                {% endfor %}
+                            {% elif current_user.role == 'admin' %}
+                                <!-- Admin uchun - barcha foydalanuvchilar -->
+                                {% for user in get_all_users() %}
+                                <option value="{{ user.id }}">{{ user.get_full_name() }} - {{ user.role|replace('_', ' ')|title }}{% if user.student_id %} ({{ user.student_id }}){% endif %}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                        <div class="form-text">
+                            {% if current_user.role == 'teacher' %}
+                                Faqat sizning talabalarigina ko'rsatilmoqda
+                            {% elif current_user.role == 'department_head' %}
+                                Kafedradagi barcha foydalanuvchilar ko'rsatilmoqda
+                            {% elif current_user.role == 'dean' %}
+                                Fakultetdagi barcha foydalanuvchilar ko'rsatilmoqda
+                            {% elif current_user.role == 'admin' %}
+                                Barcha foydalanuvchilar ko'rsatilmoqda
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <input type="hidden" name="author_id" value="{{ current_user.id }}">
+                    {% endif %}
+
+                    <!-- Hujjat nomi -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Hujjat nomi <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" required 
+                               placeholder="Masalan: Diplom loyihasi, Ilmiy maqola, ...">
+                    </div>
+                    
+                    <!-- Hujjat turi - ROLGA QARAB CHEKLANGAN -->
+                    <div class="mb-3">
+                        <label for="document_type" class="form-label">Hujjat turi <span class="text-danger">*</span></label>
+                        <select class="form-select" id="document_type" name="document_type" required>
+                            <option value="">Tanlang...</option>
+                            
+                            {% if current_user.role == 'student' %}
+                                <!-- Talaba uchun faqat o'quv hujjatlari -->
+                                <option value="diploma_project">Diplom loyihasi</option>
+                                <option value="course_work">Kurs ishi</option>
+                                <option value="thesis">Magistrlik dissertatsiyasi</option>
+                                <option value="scientific_article">Ilmiy maqola</option>
+                                <option value="application">Ariza (stipendiya, akademik)</option>
+                            
+                            {% elif current_user.role == 'teacher' %}
+                                <!-- O'qituvchi uchun - o'quv va metodik hujjatlar -->
+                                <option value="diploma_project">Diplom loyihasi</option>
+                                <option value="course_work">Kurs ishi</option>
+                                <option value="thesis">Magistrlik dissertatsiyasi</option>
+                                <option value="scientific_article">Ilmiy maqola</option>
+                                <option value="methodological_guide">Metodik qo'llanma</option>
+                                <option value="syllabus">O'quv dasturi</option>
+                                <option value="test_assignment">Test topshirig'i</option>
+                                <option value="report">Hisobot (ilmiy, o'quv)</option>
+                                <option value="application">Ariza</option>
+                            
+                            {% elif current_user.role == 'department_head' %}
+                                <!-- Kafedra mudiri uchun - kafedra hujjatlari -->
+                                <option value="department_report">Kafedra hisoboti</option>
+                                <option value="work_plan">Ish rejasi</option>
+                                <option value="protocol">Protokol</option>
+                                <option value="order">Buyruq</option>
+                                <option value="scientific_article">Ilmiy maqola</option>
+                                <option value="methodological_guide">Metodik qo'llanma</option>
+                                <option value="report">Hisobot</option>
+                                <option value="application">Ariza</option>
+                            
+                            {% elif current_user.role == 'dean' %}
+                                <!-- Dekan uchun - fakultet hujjatlari -->
+                                <option value="faculty_report">Fakultet hisoboti</option>
+                                <option value="order">Buyruq</option>
+                                <option value="protocol">Protokol</option>
+                                <option value="work_plan">Ish rejasi</option>
+                                <option value="academic_plan">O'quv reja</option>
+                                <option value="report">Hisobot</option>
+                                <option value="application">Ariza</option>
+                            
+                            {% elif current_user.role == 'admin' %}
+                                <!-- Admin uchun - barcha hujjat turlari -->
+                                <option value="diploma_project">Diplom loyihasi</option>
+                                <option value="course_work">Kurs ishi</option>
+                                <option value="thesis">Magistrlik dissertatsiyasi</option>
+                                <option value="scientific_article">Ilmiy maqola</option>
+                                <option value="methodological_guide">Metodik qo'llanma</option>
+                                <option value="syllabus">O'quv dasturi</option>
+                                <option value="test_assignment">Test topshirig'i</option>
+                                <option value="department_report">Kafedra hisoboti</option>
+                                <option value="faculty_report">Fakultet hisoboti</option>
+                                <option value="work_plan">Ish rejasi</option>
+                                <option value="academic_plan">O'quv reja</option>
+                                <option value="protocol">Protokol</option>
+                                <option value="order">Buyruq</option>
+                                <option value="report">Hisobot</option>
+                                <option value="application">Ariza</option>
+                            {% endif %}
+                            
+                            <option value="other">Boshqa</option>
+                        </select>
+                        <div class="form-text">
+                            {% if current_user.role == 'student' %}
+                                Talabalar faqat o'quv hujjatlarini yuklashi mumkin
+                            {% elif current_user.role == 'teacher' %}
+                                O'qituvchilar o'quv va metodik hujjatlarni yuklashi mumkin
+                            {% elif current_user.role == 'department_head' %}
+                                Kafedra mudirlari kafedra hujjatlarini yuklashi mumkin
+                            {% elif current_user.role == 'dean' %}
+                                Dekanlar fakultet hujjatlarini yuklashi mumkin
+                            {% elif current_user.role == 'admin' %}
+                                Administratorlar barcha turdagi hujjatlarni yuklashi mumkin
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Hujjat tavsifi -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Hujjat tavsifi</label>
+                        <textarea class="form-control" id="description" name="description" 
+                                  rows="4" placeholder="Hujjatning qisqacha tavsifi..."></textarea>
+                    </div>
+                    
+                    <!-- Fayl yuklash -->
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Fayl yuklash (ixtiyoriy)</label>
+                        <input type="file" class="form-control" id="file" name="file">
+                        <div class="form-text">Qo'llab-quvvatlanadigan formatlar: PDF, DOC, DOCX, TXT (Maks. 10MB)</div>
+                    </div>
+                    
+                    <!-- Rahbar tanlash (faqat talabalar uchun) -->
+                    {% if current_user.role == 'student' %}
+                    <div class="mb-3">
+                        <label for="supervisor_id" class="form-label">Ilmiy rahbar</label>
+                        <select class="form-select" id="supervisor_id" name="supervisor_id">
+                            <option value="">Tanlang (ixtiyoriy)</option>
+                            {% for teacher in get_available_supervisors() %}
+                            <option value="{{ teacher.id }}">{{ teacher.get_full_name() }} - {{ teacher.department }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Hujjatni tasdiqlashi kerak bo'lgan ilmiy rahbarni tanlang</div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Tasdiqlovchilarni tanlash (admin, dekan, kafedra mudiri uchun) -->
+                    {% if current_user.role in ['admin', 'dean', 'department_head'] %}
+                    <div class="mb-3">
+                        <label class="form-label">Tasdiqlovchilar (ixtiyoriy)</label>
+                        
+                        <!-- Supervisor (o'qituvchi) -->
+                        <div class="mb-2">
+                            <label for="supervisor_id" class="form-label small">Ilmiy rahbar</label>
+                            <select class="form-select" id="supervisor_id" name="supervisor_id">
+                                <option value="">Tanlanmagan</option>
+                                {% for teacher in get_teachers() %}
+                                <option value="{{ teacher.id }}">{{ teacher.get_full_name() }} - {{ teacher.department }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Kafedra mudiri -->
+                        <div class="mb-2">
+                            <label for="department_head_id" class="form-label small">Kafedra mudiri</label>
+                            <select class="form-select" id="department_head_id" name="department_head_id">
+                                <option value="">Tanlanmagan</option>
+                                {% for head in get_department_heads() %}
+                                <option value="{{ head.id }}">{{ head.get_full_name() }} - {{ head.department }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Dekan -->
+                        {% if current_user.role in ['admin', 'dean'] %}
+                        <div class="mb-2">
+                            <label for="dean_id" class="form-label small">Dekan</label>
+                            <select class="form-select" id="dean_id" name="dean_id">
+                                <option value="">Tanlanmagan</option>
+                                {% for dean in get_deans() %}
+                                <option value="{{ dean.id }}">{{ dean.get_full_name() }} - {{ dean.faculty }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('documents') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Ortga
+                        </a>
+                        <button type="submit" class="btn btn-primary-gradient">
+                            <i class="fas fa-save me-2"></i>Saqlash
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card card-custom">
+            <div class="card-header card-header-gradient">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i> Ko'rsatmalar
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info-custom alert-custom">
+                    <h6><i class="fas fa-lightbulb me-2"></i> Maslahatlar</h6>
+                    <ul class="small mb-0">
+                        <li>Hujjat nomi aniq va tushunarli bo'lsin</li>
+                        <li>Hujjat turini to'g'ri tanlang</li>
+                        {% if current_user.role in ['admin', 'teacher', 'department_head', 'dean'] %}
+                        <li>Muallifni diqqat bilan tanlang - hujjat uning nomiga yaratiladi</li>
+                        {% endif %}
+                        {% if current_user.role == 'student' %}
+                        <li>Ilmiy rahbarni tanlash - hujjatni tasdiqlash jarayonini tezlashtiradi</li>
+                        {% endif %}
+                        <li>Fayl yuklash ixtiyoriy - keyinroq ham qo'shishingiz mumkin</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-3">
+                    <h6>Hujjat Holatlari:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge-warning">Qoralama</span>
+                        <span class="badge-info">Yuborilgan</span>
+                        <span class="badge-success">Tasdiqlangan</span>
+                        <span class="badge-danger">Rad etilgan</span>
+                    </div>
+                </div>
+
+                <!-- Rolga qarab qo'shimcha ko'rsatmalar -->
+                <div class="mt-3">
+                    <h6>Sizning huquqlaringiz:</h6>
+                    <ul class="small">
+                        {% if current_user.role == 'student' %}
+                            <li>Faqat o'zingiz uchun hujjat yaratishingiz mumkin</li>
+                            <li>Faqat o'quv hujjatlari: diplom, kurs ishi, magistratura, ilmiy maqola</li>
+                            <li>Ilmiy rahbar tanlashingiz mumkin</li>
+                        {% elif current_user.role == 'teacher' %}
+                            <li>O'zingiz va talabalar uchun hujjat yaratishingiz mumkin</li>
+                            <li>O'quv va metodik hujjatlarni yuklashingiz mumkin</li>
+                            <li>Talabalar hujjatlarini tasdiqlashingiz mumkin</li>
+                        {% elif current_user.role == 'department_head' %}
+                            <li>Kafedradagi barcha foydalanuvchilar uchun hujjat yaratishingiz mumkin</li>
+                            <li>Kafedra hujjatlarini yuklashingiz mumkin</li>
+                            <li>Kafedra hujjatlarini tasdiqlashingiz mumkin</li>
+                        {% elif current_user.role == 'dean' %}
+                            <li>Fakultetdagi barcha foydalanuvchilar uchun hujjat yaratishingiz mumkin</li>
+                            <li>Fakultet hujjatlarini yuklashingiz mumkin</li>
+                            <li>Fakultet hujjatlarini tasdiqlashingiz mumkin</li>
+                        {% elif current_user.role == 'admin' %}
+                            <li>Barcha foydalanuvchilar uchun hujjat yaratishingiz mumkin</li>
+                            <li>Barcha turdagi hujjatlarni yuklashingiz mumkin</li>
+                            <li>Barcha hujjatlarni boshqarishingiz mumkin</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Formani yuborishdan oldin tekshirish
+document.getElementById('documentForm').addEventListener('submit', function(e) {
+    const title = document.getElementById('title').value.trim();
+    const documentType = document.getElementById('document_type').value;
+    
+    if (!title) {
+        e.preventDefault();
+        alert('Hujjat nomini kiriting!');
+        return false;
+    }
+    
+    if (!documentType) {
+        e.preventDefault();
+        alert('Hujjat turini tanlang!');
+        return false;
+    }
+
+    // Muallif tanlanganligini tekshirish
+    {% if current_user.role in ['admin', 'teacher', 'department_head', 'dean'] %}
+    const authorId = document.getElementById('author_id').value;
+    if (!authorId) {
+        e.preventDefault();
+        alert('Muallifni tanlang!');
+        return false;
+    }
+    {% endif %}
+});
+
+// Dinamik ravishda tasdiqlovchilarni sozlash
+{% if current_user.role in ['admin', 'dean', 'department_head'] %}
+document.getElementById('author_id').addEventListener('change', function() {
+    const authorId = this.value;
+    
+    // AJAX so'rov orqali tanlangan muallif ma'lumotlarini olish
+    fetch(`/api/user/${authorId}/details`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.role === 'student') {
+                // Agar talaba tanlangan bo'lsa, supervisor maydonini ko'rsatish
+                document.getElementById('supervisor_id').parentElement.style.display = 'block';
+            } else {
+                // Boshqa rollar uchun supervisor maydonini yashirish
+                document.getElementById('supervisor_id').parentElement.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+});
+{% endif %}
+</script>
+{% endblock %}

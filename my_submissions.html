@@ -1,0 +1,480 @@
+{% extends "base.html" %}
+
+{% block title %}Yuborilgan Hujjatlar - UniDoc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-paper-plane me-2"></i> Yuborilgan Hujjatlar</h1>
+    <p>Tasdiqlash jarayonidagi barcha yuborilgan hujjatlar</p>
+</div>
+
+<!-- Filtrlar va statistikalar -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card card-custom">
+            <div class="card-body text-center">
+                <h3 class="text-primary">{{ submissions|length }}</h3>
+                <p class="text-muted mb-0">Jami Yuborilgan</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-custom">
+            <div class="card-body text-center">
+                <h3 class="text-info">{{ submissions|selectattr("status", "equalto", "submitted")|list|length }}</h3>
+                <p class="text-muted mb-0">Ko'rib Chiqilmoqda</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-custom">
+            <div class="card-body text-center">
+                <h3 class="text-success">{{ submissions|selectattr("status", "equalto", "approved")|list|length }}</h3>
+                <p class="text-muted mb-0">Tasdiqlangan</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-custom">
+            <div class="card-body text-center">
+                <h3 class="text-danger">{{ submissions|selectattr("status", "equalto", "rejected")|list|length }}</h3>
+                <p class="text-muted mb-0">Rad Etilgan</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header card-header-gradient d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-list me-2"></i> Yuborilgan Hujjatlar Ro'yxati
+        </h5>
+        <div class="dropdown">
+            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-filter me-2"></i>Filtr
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="?status=all">Barchasi</a></li>
+                <li><a class="dropdown-item" href="?status=submitted">Ko'rib Chiqilmoqda</a></li>
+                <li><a class="dropdown-item" href="?status=approved">Tasdiqlangan</a></li>
+                <li><a class="dropdown-item" href="?status=rejected">Rad Etilgan</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if submissions %}
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Hujjat Nomi</th>
+                        <th>Turi</th>
+                        <th>Joriy Bosqich</th>
+                        <th>Holati</th>
+                        <th>Yuborilgan Sana</th>
+                        <th>Oxirgi Yangilanish</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in submissions %}
+                    <tr>
+                        <td>
+                            <strong>{{ doc.title }}</strong>
+                            {% if doc.description %}
+                            <br><small class="text-muted">{{ doc.description[:60] }}{% if doc.description|length > 60 %}...{% endif %}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if doc.document_type == 'diploma_project' %}
+                                <span class="badge-info">Diplom Loyihasi</span>
+                            {% elif doc.document_type == 'scientific_article' %}
+                                <span class="badge-info">Ilmiy Maqola</span>
+                            {% elif doc.document_type == 'course_work' %}
+                                <span class="badge-info">Kurs Ishi</span>
+                            {% elif doc.document_type == 'thesis' %}
+                                <span class="badge-info">Magistrlik</span>
+                            {% elif doc.document_type == 'report' %}
+                                <span class="badge-info">Hisobot</span>
+                            {% elif doc.document_type == 'application' %}
+                                <span class="badge-info">Ariza</span>
+                            {% else %}
+                                <span class="badge-secondary">{{ doc.document_type }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if doc.status == 'submitted' %}
+                                <div class="d-flex align-items-center">
+                                    <div class="stepper-circle completed me-2">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="stepper-circle active me-2">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <div class="stepper-circle me-2">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div class="stepper-circle">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Rahbar tasdiqlashi kutilmoqda</small>
+                            {% elif doc.status == 'supervisor_approved' %}
+                                <div class="d-flex align-items-center">
+                                    <div class="stepper-circle completed me-2">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="stepper-circle completed me-2">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <div class="stepper-circle active me-2">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div class="stepper-circle">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Kafedra tasdiqlashi kutilmoqda</small>
+                            {% elif doc.status == 'department_approved' %}
+                                <div class="d-flex align-items-center">
+                                    <div class="stepper-circle completed me-2">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="stepper-circle completed me-2">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <div class="stepper-circle completed me-2">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div class="stepper-circle active">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Dekan tasdiqlashi kutilmoqda</small>
+                            {% elif doc.status == 'approved' %}
+                                <div class="d-flex align-items-center">
+                                    <div class="stepper-circle completed me-2">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="stepper-circle completed me-2">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <div class="stepper-circle completed me-2">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div class="stepper-circle completed">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                </div>
+                                <small class="text-success">Barcha bosqichlar yakunlandi</small>
+                            {% elif doc.status == 'rejected' %}
+                                <div class="text-center">
+                                    <i class="fas fa-times-circle fa-2x text-danger"></i>
+                                    <br>
+                                    <small class="text-danger">Jarayon to'xtatildi</small>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if doc.status == 'draft' %}
+                                <span class="badge-warning">Qoralama</span>
+                            {% elif doc.status == 'submitted' %}
+                                <span class="badge-info">Rahbar Tasdiqlashi Kutilmoqda</span>
+                            {% elif doc.status == 'supervisor_approved' %}
+                                <span class="badge-primary">Kafedra Tasdiqlashi Kutilmoqda</span>
+                            {% elif doc.status == 'department_approved' %}
+                                <span class="badge-primary">Dekan Tasdiqlashi Kutilmoqda</span>
+                            {% elif doc.status == 'approved' %}
+                                <span class="badge-success">Tasdiqlangan</span>
+                            {% elif doc.status == 'rejected' %}
+                                <span class="badge-danger">Rad Etilgan</span>
+                            {% else %}
+                                <span class="badge-secondary">{{ doc.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small>{{ doc.created_at.strftime('%d.%m.%Y') }}</small>
+                            <br>
+                            <small class="text-muted">{{ doc.created_at.strftime('%H:%M') }}</small>
+                        </td>
+                        <td>
+                            <small>{{ doc.updated_at.strftime('%d.%m.%Y') }}</small>
+                            <br>
+                            <small class="text-muted">{{ doc.updated_at.strftime('%H:%M') }}</small>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewDocument({{ doc.id }})" title="Ko'rish">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info" onclick="viewDocumentProgress({{ doc.id }})" title="Jarayonni Kuzatish">
+                                    <i class="fas fa-chart-line"></i>
+                                </button>
+                                {% if doc.status == 'rejected' %}
+                                <button class="btn btn-sm btn-outline-warning" onclick="resubmitDocument({{ doc.id }})" title="Qayta Yuborish">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">Hozircha hech qanday yuborilgan hujjat mavjud emas</h4>
+            <p class="text-muted">Hujjatlaringizni tasdiqlash jarayoniga yuborish uchun "Hujjatlar" bo'limiga o'ting</p>
+            <a href="{{ url_for('documents') }}" class="btn btn-primary-gradient mt-3">
+                <i class="fas fa-folder me-2"></i>Hujjatlarim Sahifasiga O'tish
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Document Progress Modal -->
+<div class="modal fade" id="progressModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Hujjat Jarayoni</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="progressContent">
+                <!-- Progress content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resubmit Modal -->
+<div class="modal fade" id="resubmitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Hujjatni Qayta Yuborish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Ushbu hujjatni qayta yuborishni tasdiqlaysizmi?</p>
+                <p class="text-muted small">Hujjat qayta yuborilgach, tasdiqlash jarayoni boshidan boshlanadi.</p>
+                <form id="resubmitForm">
+                    <input type="hidden" id="resubmitDocId">
+                    <div class="mb-3">
+                        <label for="resubmitComment" class="form-label">Qayta yuborish sababi (ixtiyoriy)</label>
+                        <textarea class="form-control" id="resubmitComment" rows="3" placeholder="Hujjatda qanday o'zgartirishlar kiritilgan..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                <button type="button" class="btn btn-warning" id="confirmResubmit">
+                    <i class="fas fa-redo me-2"></i>Qayta Yuborish
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewDocument(docId) {
+    // Hujjatni ko'rish - oddiy ko'rinish
+    window.location.href = `/document/${docId}/view`;
+}
+
+function viewDocumentProgress(docId) {
+    // Hujjat jarayonini yuklash
+    fetch(`/api/document/${docId}/progress`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            
+            const content = `
+                <div class="mb-4">
+                    <h6>Hujjat ma'lumotlari</h6>
+                    <p><strong>Nomi:</strong> ${data.title}</p>
+                    <p><strong>Turi:</strong> ${data.type}</p>
+                    <p><strong>Holati:</strong> <span class="badge badge-${data.status_class}">${data.status_text}</span></p>
+                </div>
+                
+                <h6 class="mb-3">Tasdiqlash jarayoni</h6>
+                <div class="workflow-stepper">
+                    <div class="stepper-step ${data.steps.submitted.completed ? 'completed' : ''} ${data.steps.submitted.active ? 'active' : ''}">
+                        <div class="stepper-circle">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stepper-label">Yuborish</div>
+                        ${data.steps.submitted.date ? `<small class="text-muted">${data.steps.submitted.date}</small>` : ''}
+                    </div>
+                    <div class="stepper-step ${data.steps.supervisor.completed ? 'completed' : ''} ${data.steps.supervisor.active ? 'active' : ''}">
+                        <div class="stepper-circle">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stepper-label">Rahbar</div>
+                        ${data.steps.supervisor.date ? `<small class="text-muted">${data.steps.supervisor.date}</small>` : ''}
+                    </div>
+                    <div class="stepper-step ${data.steps.department.completed ? 'completed' : ''} ${data.steps.department.active ? 'active' : ''}">
+                        <div class="stepper-circle">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="stepper-label">Kafedra</div>
+                        ${data.steps.department.date ? `<small class="text-muted">${data.steps.department.date}</small>` : ''}
+                    </div>
+                    <div class="stepper-step ${data.steps.dean.completed ? 'completed' : ''} ${data.steps.dean.active ? 'active' : ''}">
+                        <div class="stepper-circle">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="stepper-label">Dekan</div>
+                        ${data.steps.dean.date ? `<small class="text-muted">${data.steps.dean.date}</small>` : ''}
+                    </div>
+                </div>
+                
+                ${data.approvals && data.approvals.length > 0 ? `
+                <div class="mt-4">
+                    <h6>Tasdiqlash tarixi</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Tasdiqlovchi</th>
+                                    <th>Rol</th>
+                                    <th>Holati</th>
+                                    <th>Izoh</th>
+                                    <th>Sana</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.approvals.map(approval => `
+                                    <tr>
+                                        <td>${approval.approver_name}</td>
+                                        <td>${approval.approval_type}</td>
+                                        <td><span class="badge badge-${approval.status_class}">${approval.status}</span></td>
+                                        <td>${approval.comments || '-'}</td>
+                                        <td>${approval.date}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${data.estimated_completion ? `
+                <div class="alert alert-info-custom alert-custom mt-4">
+                    <i class="fas fa-clock me-2"></i>
+                    <strong>Taxminiy yakunlanish vaqti:</strong> ${data.estimated_completion}
+                </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('progressContent').innerHTML = content;
+            const modal = new bootstrap.Modal(document.getElementById('progressModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ma\'lumotlarni yuklashda xatolik yuz berdi');
+        });
+}
+
+function resubmitDocument(docId) {
+    document.getElementById('resubmitDocId').value = docId;
+    const modal = new bootstrap.Modal(document.getElementById('resubmitModal'));
+    modal.show();
+}
+
+// Qayta yuborishni tasdiqlash
+document.getElementById('confirmResubmit').addEventListener('click', function() {
+    const docId = document.getElementById('resubmitDocId').value;
+    const comment = document.getElementById('resubmitComment').value;
+    
+    fetch(`/api/document/${docId}/resubmit`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            comment: comment
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            bootstrap.Modal.getInstance(document.getElementById('resubmitModal')).hide();
+            location.reload();
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Xatolik yuz berdi');
+    });
+});
+
+// Filtr parametrlarini qo'llash
+const urlParams = new URLSearchParams(window.location.search);
+const statusFilter = urlParams.get('status');
+if (statusFilter && statusFilter !== 'all') {
+    document.querySelectorAll('tr').forEach(row => {
+        const statusCell = row.querySelector('td:nth-child(4)');
+        if (statusCell) {
+            const status = statusCell.textContent.trim().toLowerCase();
+            if (!status.includes(statusFilter)) {
+                row.style.display = 'none';
+            }
+        }
+    });
+}
+</script>
+
+<style>
+.stepper-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    color: #94a3b8;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.stepper-circle.completed {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+.stepper-circle.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.badge-info {
+    background: var(--primary-color);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+</style>
+{% endblock %}
